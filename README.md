@@ -70,6 +70,7 @@ Merak edenler için projede neler olduğunu da özetleyeyim:
 - **`downloads/`**: İndirilen dosyaların kaydedildiği klasör.
 
 ---
+Bu yazılım yalnızca eğitim ve kişisel araştırma amaçlı geliştirilmiştir. Yazılımın kullanımı sırasında YouTube Hizmet Şartları'na ve yerel telif hakkı yasalarına uyulması kullanıcının sorumluluğundadır.
 ---
 
 # 🇬🇧 English
@@ -136,3 +137,7 @@ Here is a summary of what's inside the project for those curious:
 - **`history.py` & `history.json`**: It keeps and manages the record of your downloaded files in `json` format.
 - **`templates/index.html`**: The face of the application. The stylish design, buttons, and animations you see are here. It contains HTML (structure), Tailwind (style), and JavaScript (logic) codes.
 - **`downloads/`**: The folder where downloaded files are saved.
+
+---
+This software is developed solely for educational and personal research purposes. Compliance with YouTube's Terms of Service and local copyright laws is the sole responsibility of the user.
+---
