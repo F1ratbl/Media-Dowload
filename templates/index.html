@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html class="dark" lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Medya İndirici - Basitleştirilmiş Görünüm</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <style type="text/tailwindcss">
+        :root {
+            --primary: #e91e63;
+            --background-dark: #0f172a;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #e91e63 0%, #4a148c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #e91e63 0%, #4a148c 100%);
+        }
+        .cyan-gradient {
+            background: linear-gradient(135deg, #00bcd4 0%, #2196f3 100%);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Loader */
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-left-color: #e91e63;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-[#0f172a] min-h-screen text-slate-100 transition-colors duration-300 flex flex-col">
+
+    <header class="sticky top-0 z-50 glass border-b border-white/5 w-full px-6 py-4">
+        <div class="max-w-[1600px] mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="resetApp()">
+                <div class="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center">
+                    <span class="material-symbols-outlined text-white">download_for_offline</span>
+                </div>
+                <h1 class="text-2xl font-extrabold tracking-tight gradient-text">Medya İndirici</h1>
+            </div>
+            <nav class="flex items-center gap-8 font-medium">
+                <a class="hover:text-[var(--primary)] transition-colors cursor-pointer" onclick="resetApp()">Yeni
+                    Analiz</a>
+                <a class="hover:text-[var(--primary)] transition-colors cursor-pointer"
+                    onclick="showSection('downloads-section')">İndirilenler</a>
+                <a class="hover:text-[var(--primary)] transition-colors cursor-pointer"
+                    onclick="loadHistory()">Geçmiş</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-6 py-12 flex-1 w-full flex flex-col justify-center">
+
+        <!-- SEARCH SECTION -->
+        <div id="search-section" class="w-full max-w-3xl mx-auto space-y-8 text-center transition-all duration-500">
+            <div class="space-y-4">
+                <h2 class="text-4xl md:text-6xl font-black tracking-tight text-white">
+                    Video <span class="gradient-text">İndir</span>
+                </h2>
+                <p class="text-slate-400 text-lg">YouTube bağlantısını yapıştırın ve analizi başlatın.</p>
+            </div>
+
+            <div class="glass p-2 rounded-2xl border border-white/10 flex items-center gap-2 shadow-2xl relative">
+                <div class="pl-4 text-slate-500">
+                    <span class="material-symbols-outlined">link</span>
+                </div>
+                <input type="text" id="url-input" placeholder="YouTube bağlantısını buraya yapıştırın..."
+                    class="flex-1 bg-transparent border-none text-white placeholder-slate-500 focus:ring-0 text-lg py-4 outline-none">
+                <button onclick="analyzeVideo()" id="analyze-btn"
+                    class="btn-gradient hover:opacity-90 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg shadow-pink-500/20">
+                    <span>ANALİZ ET</span>
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </button>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message"
+                class="hidden p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
+                Hata: Lütfen geçerli bir YouTube bağlantısı girin.
+            </div>
+        </div>
+
+        <!-- RESULT SECTION -->
+        <div id="result-section"
+            class="hidden grid-cols-1 lg:grid-cols-12 gap-8 items-start animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div class="lg:col-span-5">
+                <div class="glass p-4 rounded-3xl relative overflow-hidden group">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-br from-[#e91e63]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <div class="relative rounded-2xl overflow-hidden aspect-video shadow-2xl">
+                        <img id="video-thumbnail" alt="Video Thumbnail" class="w-full h-full object-cover" src="" />
+                        <div class="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded font-mono"
+                            id="video-duration">
+                            00:00
+                        </div>
+                        <div class="absolute top-3 left-3 flex items-center gap-2">
+                            <span class="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span
+                                class="bg-black/40 backdrop-blur-md text-[10px] uppercase font-bold text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/20">Analiz
+                                Tamamlandı</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 px-2">
+                        <h2 id="video-title" class="text-white font-bold text-xl leading-tight">Video Başlığı</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass p-4 rounded-2xl flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
+                            <span class="material-symbols-outlined text-slate-400">visibility</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">İzlenme Sayısı</p>
+                            <p class="text-xl font-bold" id="view-count">0</p>
+                        </div>
+                    </div>
+                    <div class="glass p-4 rounded-2xl flex items-center gap-4">
+                        <div class="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
+                            <span class="material-symbols-outlined text-slate-400">verified</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold mb-0.5">Yayıncı Kanal</p>
+                            <p class="text-xl font-bold" id="channel-name">Kanal Adı</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="glass rounded-3xl p-6 overflow-hidden">
+                    <div class="flex items-center p-1.5 bg-slate-900/50 rounded-2xl mb-8 border border-white/5">
+                        <button onclick="switchTab('video')" id="tab-video"
+                            class="flex-1 py-3 px-6 rounded-xl font-bold transition-all text-sm flex items-center justify-center gap-2 bg-slate-800 shadow-lg text-white">
+                            <span class="material-symbols-outlined text-[#e91e63]">videocam</span>
+                            Video (MP4)
+                        </button>
+                        <button onclick="switchTab('audio')" id="tab-audio"
+                            class="flex-1 py-3 px-6 rounded-xl font-bold transition-all text-sm flex items-center justify-center gap-2 text-slate-500 hover:text-white">
+                            <span class="material-symbols-outlined">headset</span>
+                            Ses (MP3)
+                        </button>
+                    </div>
+
+                    <!-- Video Downloads -->
+                    <div id="video-options" class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                        <!-- Dynamic Quality Buttons will be injected here -->
+                    </div>
+
+                    <!-- Audio Downloads (Hidden initially) -->
+                    <div id="audio-options" class="hidden grid-cols-1 xl:grid-cols-2 gap-4">
+                        <div
+                            class="group glass p-5 rounded-2xl border-2 border-transparent hover:border-cyan-500/30 transition-all bg-white/5">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div
+                                        class="w-12 h-12 cyan-gradient rounded-xl flex items-center justify-center text-white font-black">
+                                        HQ</div>
+                                    <div>
+                                        <p class="font-bold">Yüksek Ses Kalitesi</p>
+                                        <p class="text-xs text-slate-500">M4A • 192kbps</p>
+                                    </div>
+                                </div>
+                                <div
+                                    class="bg-cyan-500/10 text-cyan-400 text-[10px] font-bold px-2 py-1 rounded border border-cyan-500/20">
+                                    PREMIUM</div>
+                            </div>
+                            <button onclick="downloadMedia('audio')"
+                                class="w-full py-3 rounded-xl cyan-gradient text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 hover:opacity-90 transition-all">
+                                <span class="material-symbols-outlined text-sm">music_note</span>
+                                Sesi İndir
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Download Progress -->
+                    <div id="download-progress" class="hidden flex-col items-center justify-center py-10 space-y-4">
+                        <div class="loader"></div>
+                        <p class="text-sm font-bold text-slate-300 animate-pulse">İndiriliyor, lütfen bekleyin...</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- DOWNLOADS SECTION (Active Activity) -->
+        <div id="downloads-section"
+            class="hidden w-full max-w-4xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <h2 class="text-3xl font-bold">Aktif İndirmeler & Son İşlemler</h2>
+            <div id="active-downloads-list" class="space-y-4">
+                <!-- Javascript will populate this -->
+                <div class="text-center text-slate-500 py-12">Henüz aktif bir indirme işlem kaydı oluşturulmadı.</div>
+            </div>
+        </div>
+
+        <!-- HISTORY SECTION -->
+        <div id="history-section"
+            class="hidden w-full max-w-5xl mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <h2 class="text-3xl font-bold">İndirme Geçmişi</h2>
+            <div id="history-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Javascript will populate this -->
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-20 border-t border-white/5 py-12 px-6">
+        <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-2 opacity-60">
+                <div class="w-6 h-6 rounded btn-gradient flex items-center justify-center">
+                    <span class="material-symbols-outlined text-[14px] text-white">download_for_offline</span>
+                </div>
+                <span class="font-bold tracking-tight">Medya İndirici</span>
+            </div>
+            <p class="text-sm text-slate-500">© 2024 Medya İndirici. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        let currentVideoUrl = "";
+        let currentVideoData = {}; // Store title/thumb etc for history logic
+        let activeDownloads = [];
+
+        // Tab Switching
+        function switchTab(tab) {
+            const videoOpts = document.getElementById('video-options');
+            const audioOpts = document.getElementById('audio-options');
+            const tabVideo = document.getElementById('tab-video');
+            const tabAudio = document.getElementById('tab-audio');
+
+            if (tab === 'video') {
+                videoOpts.classList.remove('hidden');
+                videoOpts.classList.add('grid');
+                audioOpts.classList.add('hidden');
+                audioOpts.classList.remove('grid');
+
+                tabVideo.classList.remove('text-slate-500', 'hover:text-white');
+                tabVideo.classList.add('bg-slate-800', 'shadow-lg', 'text-white');
+                tabVideo.querySelector('span').classList.add('text-[#e91e63]');
+
+                tabAudio.classList.add('text-slate-500', 'hover:text-white');
+                tabAudio.classList.remove('bg-slate-800', 'shadow-lg', 'text-white');
+                tabAudio.querySelector('span').classList.remove('text-[#e91e63]');
+            } else {
+                audioOpts.classList.remove('hidden');
+                audioOpts.classList.add('grid');
+                videoOpts.classList.add('hidden');
+                videoOpts.classList.remove('grid');
+
+                tabAudio.classList.remove('text-slate-500', 'hover:text-white');
+                tabAudio.classList.add('bg-slate-800', 'shadow-lg', 'text-white');
+                tabAudio.querySelector('span').classList.add('text-[#e91e63]');
+
+                tabVideo.classList.add('text-slate-500', 'hover:text-white');
+                tabVideo.classList.remove('bg-slate-800', 'shadow-lg', 'text-white');
+                tabVideo.querySelector('span').classList.remove('text-[#e91e63]');
+            }
+        }
+
+        function renderQualities(qualities) {
+            const container = document.getElementById('video-options');
+            if (!qualities || qualities.length === 0) {
+                // Fallback if no qualities found (shouldn't happen with new backend)
+                container.innerHTML = `
+                    <div class="group glass p-5 rounded-2xl border-2 border-[#e91e63]/20 transition-all bg-white/5">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 btn-gradient rounded-xl flex items-center justify-center text-white font-black">HD</div>
+                                <div>
+                                    <p class="font-bold">Otomatik Kalite</p>
+                                    <p class="text-xs text-slate-500">MP4 • En İyi</p>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="downloadMedia('video')" class="w-full py-3 rounded-xl btn-gradient text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-pink-500/20 hover:opacity-90 transition-all">
+                            <span class="material-symbols-outlined text-sm">cloud_download</span>
+                            Hemen İndir
+                        </button>
+                    </div>
+                 `;
+                return;
+            }
+
+            container.innerHTML = qualities.map(q => `
+                <div class="group glass p-5 rounded-2xl border-2 border-[#e91e63]/20 hover:border-[#e91e63]/50 transition-all bg-white/5">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 btn-gradient rounded-xl flex items-center justify-center text-white font-black text-sm">${q.resolution}</div>
+                            <div>
+                                <p class="font-bold">${q.resolution} (MP4)</p>
+                                <p class="text-xs text-slate-500">~${q.filesize}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <button onclick="downloadMedia('video', '${q.format_id}', '${q.resolution}')" class="w-full py-3 rounded-xl btn-gradient text-white font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-pink-500/20 hover:opacity-90 transition-all">
+                        <span class="material-symbols-outlined text-sm">cloud_download</span>
+                        İndir (${q.filesize})
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        async function analyzeVideo() {
+            const urlInput = document.getElementById('url-input');
+            const analyzeBtn = document.getElementById('analyze-btn');
+            const errorMessage = document.getElementById('error-message');
+            const searchSection = document.getElementById('search-section');
+            const resultSection = document.getElementById('result-section');
+
+            const url = urlInput.value.trim();
+            if (!url) return;
+
+            // UI Loading State
+            analyzeBtn.innerHTML = '<div class="loader w-5 h-5 border-white/20 border-l-white"></div>';
+            analyzeBtn.disabled = true;
+            errorMessage.classList.add('hidden');
+
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url: url })
+                });
+
+                if (!response.ok) throw new Error('Analiz başarısız');
+
+                const data = await response.json();
+
+                // Populate Data
+                document.getElementById('video-title').textContent = data.title;
+                document.getElementById('video-thumbnail').src = data.thumbnail;
+                document.getElementById('video-duration').textContent = data.duration;
+                document.getElementById('view-count').textContent = data.views;
+                document.getElementById('channel-name').textContent = data.channel;
+
+                currentVideoUrl = url;
+                currentVideoData = data;
+
+                // Render Qualities
+                renderQualities(data.qualities);
+
+                // Switch Views
+                searchSection.classList.add('hidden');
+                resultSection.classList.remove('hidden');
+                resultSection.classList.add('grid');
+
+            } catch (error) {
+                errorMessage.classList.remove('hidden');
+                console.error(error);
+            } finally {
+                analyzeBtn.innerHTML = '<span>ANALİZ ET</span><span class="material-symbols-outlined text-sm">arrow_forward</span>';
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        function showSection(sectionId) {
+            document.getElementById('search-section').classList.add('hidden');
+            document.getElementById('result-section').classList.add('hidden');
+            document.getElementById('result-section').classList.remove('grid');
+            document.getElementById('history-section').classList.add('hidden');
+            document.getElementById('downloads-section').classList.add('hidden');
+
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        function resetApp() {
+            showSection('search-section');
+            document.getElementById('url-input').value = "";
+            document.getElementById('video-options').classList.remove('hidden');
+            switchTab('video');
+        }
+
+        // --- ASYNC DOWNLOAD LOGIC ---
+
+        function renderDownloads() {
+            const container = document.getElementById('active-downloads-list');
+            if (activeDownloads.length === 0) {
+                container.innerHTML = '<div class="text-center text-slate-500 py-12">Henüz aktif bir indirme işlem kaydı oluşturulmadı.</div>';
+                return;
+            }
+
+            container.innerHTML = activeDownloads.map(item => `
+                <div class="glass p-4 rounded-xl flex items-center gap-4">
+                    <img src="${item.thumbnail}" class="w-24 h-16 object-cover rounded-lg bg-slate-800">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-white line-clamp-1">${item.title}</h4>
+                        <div class="flex justify-between text-xs text-slate-400 capitalize mb-1">
+                            <span>${item.type} • ${item.statusText || 'Hazırlanıyor...'}</span>
+                            <span class="font-bold text-white">${item.progress || '0%'}</span>
+                        </div>
+                        <div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-pink-500 to-purple-500 transition-all duration-300" style="width: ${item.progress || '0%'}"></div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function downloadMedia(type, formatId = null, resolutionLabel = "") {
+            if (!currentVideoUrl) return;
+
+            const tempId = Date.now().toString(); // Temporary ID until backend assigns task_id
+
+            // Helpful label for type
+            let displayType = type;
+            if (type === 'video' && resolutionLabel) displayType = `Video (${resolutionLabel})`;
+
+            // UI Update
+            const downloadItem = {
+                tempId: tempId,
+                title: currentVideoData.title || "Video",
+                thumbnail: currentVideoData.thumbnail || "",
+                type: displayType,
+                statusText: "Başlatılıyor...",
+                progress: "0%"
+            };
+
+            activeDownloads.unshift(downloadItem);
+            renderDownloads();
+            showSection('downloads-section');
+
+            try {
+                // Start Download on Backend
+                const response = await fetch('/start_download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        url: currentVideoUrl,
+                        type: type,
+                        title: currentVideoData.title || "Video",
+                        thumbnail: currentVideoData.thumbnail || "",
+                        format_id: formatId
+                    })
+                });
+
+                if (!response.ok) throw new Error("İndirme başlatılamadı");
+                const data = await response.json();
+                const taskId = data.task_id;
+
+                // Mark item with real taskId and start polling
+                const idx = activeDownloads.findIndex(x => x.tempId === tempId);
+                if (idx !== -1) {
+                    activeDownloads[idx].taskId = taskId;
+                    pollStatus(taskId, idx);
+                }
+
+            } catch (error) {
+                console.error(error);
+                const idx = activeDownloads.findIndex(x => x.tempId === tempId);
+                if (idx !== -1) {
+                    activeDownloads[idx].statusText = "Hata Oluştu";
+                    renderDownloads();
+                }
+            }
+        }
+
+        async function pollStatus(taskId, arrayIndex) {
+            const interval = setInterval(async () => {
+                try {
+                    const res = await fetch(`/task_status/${taskId}`);
+                    if (!res.ok) return; // Wait for next tick
+
+                    const statusData = await res.json();
+
+                    // Update UI
+                    if (activeDownloads[arrayIndex]) {
+                        activeDownloads[arrayIndex].progress = statusData.progress;
+
+                        if (statusData.status === 'completed') {
+                            activeDownloads[arrayIndex].statusText = "Tamamlandı";
+                            activeDownloads[arrayIndex].progress = "100%";
+                            renderDownloads();
+                            clearInterval(interval);
+
+                            // Trigger Download
+                            window.location.href = `/get_file/${taskId}`;
+                        }
+                        else if (statusData.status === 'error') {
+                            activeDownloads[arrayIndex].statusText = "Hata";
+                            renderDownloads();
+                            clearInterval(interval);
+                        } else {
+                            activeDownloads[arrayIndex].statusText = statusData.statusText || "İndiriliyor...";
+                            renderDownloads();
+                        }
+                    } else {
+                        clearInterval(interval); // Item removed from UI?
+                    }
+
+                } catch (e) {
+                    console.error("Polling error", e);
+                }
+            }, 1000); // Check every 1s
+        }
+
+        async function loadHistory() {
+            showSection('history-section');
+            const container = document.getElementById('history-list');
+            container.innerHTML = '<div class="col-span-full text-center py-12"><div class="loader mx-auto"></div></div>';
+
+            try {
+                const res = await fetch('/history');
+                const history = await res.json();
+
+                if (history.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center text-slate-500 py-12">İndirme geçmişi boş.</div>';
+                    return;
+                }
+
+                container.innerHTML = history.map(item => `
+                    <div class="glass p-4 rounded-2xl group hover:bg-white/5 transition-all">
+                        <div class="relative rounded-xl overflow-hidden aspect-video mb-4">
+                            <img src="${item.thumbnail}" class="w-full h-full object-cover">
+                            <div class="absolute bottom-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded capitalize">
+                                ${item.type}
+                            </div>
+                        </div>
+                        <h3 class="font-bold text-lg leading-tight mb-2 line-clamp-2">${item.title}</h3>
+                        <p class="text-xs text-slate-500 mb-4">${item.date}</p>
+                        <a href="${item.url}" target="_blank" class="text-xs font-bold text-pink-500 hover:text-pink-400 flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">open_in_new</span>
+                            YouTube'da Aç
+                        </a>
+                    </div>
+                `).join('');
+
+            } catch (e) {
+                container.innerHTML = '<div class="col-span-full text-center text-red-500 py-12">Geçmiş yüklenemedi.</div>';
+            }
+        }
+
+        document.getElementById('url-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                analyzeVideo();
+            }
+        });
+    </script>
+
+</body>
+
+</html>
