@@ -97,6 +97,7 @@ Merak edenler için projede neler olduğunu da özetleyeyim:
 - **`.env`**: Gizli ayarların (veritabanı şifresi vb.) tutulduğu dosya.
 
 ---
+Bu yazılım yalnızca eğitim ve kişisel araştırma amaçlı geliştirilmiştir. Yazılımın kullanımı sırasında YouTube Hizmet Şartları'na ve yerel telif hakkı yasalarına uyulması kullanıcının sorumluluğundadır.
 ---
 
 # 🇬🇧 English
@@ -190,3 +191,7 @@ Here is a summary of what's inside the project for those curious:
 - **`downloads/`**: The folder where downloaded files are saved.
 - **`docker-compose.yml` & `Dockerfile`**: Configuration files to run the project with Docker.
 - **`.env`**: File where sensitive settings (like database password) are kept.
+
+---
+This software is developed solely for educational and personal research purposes. Compliance with YouTube's Terms of Service and local copyright laws is the sole responsibility of the user.
+---
