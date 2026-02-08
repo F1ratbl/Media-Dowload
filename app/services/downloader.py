@@ -1,7 +1,7 @@
 import yt_dlp
 import os
 from datetime import datetime
-from history import HistoryManager
+from app.services.history import HistoryManager
 
 # CONVERSION
 def format_filesize(bytes_size):
@@ -108,15 +108,27 @@ def download_worker(task_id: str, url: str, type: str, title: str, thumbnail: st
             'outtmpl': output_template,
             'progress_hooks': [progress_hook],
             'nocheckcertificate': True,
-            'merge_output_format': 'mp4',
         }
 
         if type == 'audio':
-            ydl_opts.update({'format': 'bestaudio[ext=m4a]/bestaudio'})
+            ydl_opts.update({
+                'format': 'bestaudio/best',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+                }],
+            })
         elif format_id:
-            ydl_opts.update({'format': format_id})
+            ydl_opts.update({
+                'format': format_id,
+                'merge_output_format': 'mp4'
+            })
         else:
-            ydl_opts.update({'format': 'best[ext=mp4]/best'})
+            ydl_opts.update({
+                'format': 'best[ext=mp4]/best',
+                'merge_output_format': 'mp4'
+            })
 
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
