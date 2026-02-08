@@ -19,6 +19,57 @@ Bu uygulama ile şunları yapabilirsin:
 
 ---
 
+## 🛠️ Kurulum ve Çalıştırma
+
+Projeyi çalıştırmanın iki yolu vardır:
+1. **Docker ile (Önerilen)** - Hiçbir şey kurmadan tek komutla çalıştırın.
+2. **Manuel Kurulum** - Python ve kütüphaneleri kendiniz kurarak çalıştırın.
+
+### Yöntem 1: Docker ile Çalıştırma 🐳 (En Kolayı)
+
+Bilgisayarınızda **Docker Desktop** yüklü olması yeterlidir. Python veya FFmpeg kurmanıza gerek kalmaz. Veritabanı (PostgreSQL) otomatik olarak kurulur.
+
+1. Proje klasörüne gelin.
+2. Terminale şu komutu yazın:
+
+```bash
+docker compose up --build
+```
+
+3. Kurulum bitince tarayıcıdan **`http://localhost:8000`** adresine gidin.
+4. İndirdiğiniz dosyalar otomatik olarak bilgisayarınızdaki `downloads/` klasörüne düşecektir.
+
+---
+
+### Yöntem 2: Manuel Kurulum ⚙️
+
+#### 1. Gereksinimler
+Bilgisayarında **Python** yüklü olmalı. Ayrıca video işlemleri için **FFmpeg** gerekebilir (çoğu sistemde `yt-dlp` bunu halleder ama aklında olsun).
+
+#### 2. Kütüphaneleri Yükle
+Terminalini aç ve proje klasörüne gelip şu komutu çalıştır:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 3. Uygulamayı Başlat
+
+```bash
+uvicorn main:app --reload
+```
+
+Bu komutu yazdıktan sonra tarayıcını açıp `http://127.0.0.1:8000` adresine gidersen uygulamanın açıldığını göreceksin!
+
+---
+
+## 🗄️ Veritabanı ve Ayarlar
+
+Bu proje, verilerini saklamak için güçlü ve güvenilir **PostgreSQL** veritabanını kullanır.
+Tüm gizli ayarlar (şifreler, portlar) **`.env`** dosyasında saklanır.
+
+---
+
 ## 🤔 "Neden URL Değişmiyor (Tek Sayfa)?"
 
 Uygulamayı kullanırken fark etmiş olabilirsin; menüden "İndirilenler" veya "Geçmiş" sayfasına geçtiğinde tarayıcının adres çubuğundaki link (URL) değişmiyor. Hep ana sayfadasın gibi görünüyor. **Bunun sebebi uygulamanın "Single Page Application (SPA)" mantığına benzer, ancak çok daha basit bir yapıda çalışmasıdır.**
@@ -33,32 +84,6 @@ Elinin altında bir **kitap** yerine tek bir **büyük poster** var. Farklı say
 
 ---
 
-## 🛠️ Kurulum ve Çalıştırma
-
-Projeyi kendi bilgisayarında çalıştırmak istersen şu adımları izleyebilirsin:
-
-### 1. Gereksinimler
-Bilgisayarında **Python** yüklü olmalı. Ayrıca video işlemleri için **FFmpeg** gerekebilir (çoğu sistemde `yt-dlp` bunu halleder ama aklında olsun).
-
-### 2. Kütüphaneleri Yükle
-Terminalini aç ve proje klasörüne gelip şu komutu çalıştır:
-
-```bash
-pip install -r requirements.txt
-```
-
-*(Eğer `requirements.txt` dosyasını henüz oluşturmadıysan, şu paketlere ihtiyacın olacak: `fastapi`, `uvicorn`, `yt-dlp`, `pydantic`)*
-
-### 3. Uygulamayı Başlat
-
-```bash
-uvicorn main:app --reload
-```
-
-Bu komutu yazdıktan sonra tarayıcını açıp `http://127.0.0.1:8000` adresine gidersen uygulamanın açıldığını göreceksin!
-
----
-
 ## 📂 Proje Yapısı (Hangi Dosya Ne İşe Yarıyor?)
 
 Merak edenler için projede neler olduğunu da özetleyeyim:
@@ -68,6 +93,8 @@ Merak edenler için projede neler olduğunu da özetleyeyim:
 - **`history.py` & `history.json`**: İndirdiğin dosyaların kaydını `json` formatında tutar ve yönetir.
 - **`templates/index.html`**: Gördüğün o şık tasarım, butonlar ve animasyonlar burada. İçinde hem HTML (yapı), hem Tailwind (stil), hem de JavaScript (mantık) kodları var.
 - **`downloads/`**: İndirilen dosyaların kaydedildiği klasör.
+- **`docker-compose.yml` & `Dockerfile`**: Projenin Docker ile çalışmasını sağlayan dosyalar.
+- **`.env`**: Gizli ayarların (veritabanı şifresi vb.) tutulduğu dosya.
 
 ---
 Bu yazılım yalnızca eğitim ve kişisel araştırma amaçlı geliştirilmiştir. Yazılımın kullanımı sırasında YouTube Hizmet Şartları'na ve yerel telif hakkı yasalarına uyulması kullanıcının sorumluluğundadır.
@@ -88,6 +115,57 @@ With this application, you can:
 
 ---
 
+## 🛠️ Installation and Usage
+
+There are two ways to run the project:
+1. **Using Docker (Recommended)** - Run with a single command without installing dependencies.
+2. **Manual Installation** - Install Python and libraries manually.
+
+### Method 1: Using Docker 🐳 (Easiest)
+
+You only need **Docker Desktop** installed on your computer. No need to install Python or FFmpeg manually. Database (PostgreSQL) is installed automatically.
+
+1. Navigate to the project folder.
+2. Run the following command in terminal:
+
+```bash
+docker compose up --build
+```
+
+3. Once built, open **`http://localhost:8000`** in your browser.
+4. Downloaded files will automatically appear in your local `downloads/` folder.
+
+---
+
+### Method 2: Manual Installation ⚙️
+
+#### 1. Requirements
+You must have **Python** installed on your computer. Additionally, **FFmpeg** might be required for video processing (in most cases `yt-dlp` handles this, but keep it in mind).
+
+#### 2. Install Libraries
+Open your terminal, navigate to the project folder, and run the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 3. Start the Application
+
+```bash
+uvicorn main:app --reload
+```
+
+After running this command, open your browser and go to `http://127.0.0.1:8000` to see the application running!
+
+---
+
+## 🗄️ Database and Configuration
+
+This project uses the robust **PostgreSQL** database to store your data.
+All sensitive settings (passwords, ports) are stored in the **`.env`** file.
+
+---
+
 ## 🤔 "Why Doesn't the URL Change? (Single Page)"
 
 You might have noticed that when you switch to the "Downloads" or "History" pages from the menu, the link (URL) in the browser's address bar doesn't change. It looks like you're always on the home page. **This is because the application works on a logic similar to a "Single Page Application (SPA)", but in a much simpler structure.**
@@ -102,32 +180,6 @@ Instead of a **book** with multiple pages, you have a single **large poster**. T
 
 ---
 
-## 🛠️ Installation and Usage
-
-If you want to run the project on your own computer, you can follow these steps:
-
-### 1. Requirements
-You must have **Python** installed on your computer. Additionally, **FFmpeg** might be required for video processing (in most cases `yt-dlp` handles this, but keep it in mind).
-
-### 2. Install Libraries
-Open your terminal, navigate to the project folder, and run the following command:
-
-```bash
-pip install -r requirements.txt
-```
-
-*(If you haven't created the `requirements.txt` file yet, you will need these packages: `fastapi`, `uvicorn`, `yt-dlp`, `pydantic`)*
-
-### 3. Start the Application
-
-```bash
-uvicorn main:app --reload
-```
-
-After running this command, open your browser and go to `http://127.0.0.1:8000` to see the application running!
-
----
-
 ## 📂 Project Structure (What Does Each File Do?)
 
 Here is a summary of what's inside the project for those curious:
@@ -137,6 +189,8 @@ Here is a summary of what's inside the project for those curious:
 - **`history.py` & `history.json`**: It keeps and manages the record of your downloaded files in `json` format.
 - **`templates/index.html`**: The face of the application. The stylish design, buttons, and animations you see are here. It contains HTML (structure), Tailwind (style), and JavaScript (logic) codes.
 - **`downloads/`**: The folder where downloaded files are saved.
+- **`docker-compose.yml` & `Dockerfile`**: Configuration files to run the project with Docker.
+- **`.env`**: File where sensitive settings (like database password) are kept.
 
 ---
 This software is developed solely for educational and personal research purposes. Compliance with YouTube's Terms of Service and local copyright laws is the sole responsibility of the user.

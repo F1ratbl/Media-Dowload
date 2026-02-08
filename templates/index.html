@@ -5,6 +5,7 @@
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>Medya İndirici - Basitleştirilmiş Görünüm</title>
+    <link rel="icon" type="image/png" href="/static/logo.png">
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
@@ -61,8 +62,13 @@
     <header class="sticky top-0 z-50 glass border-b border-white/5 w-full px-6 py-4">
         <div class="max-w-[1600px] mx-auto flex items-center justify-between">
             <div class="flex items-center gap-2 cursor-pointer" onclick="resetApp()">
-                <div class="w-10 h-10 rounded-xl btn-gradient flex items-center justify-center">
-                    <span class="material-symbols-outlined text-white">download_for_offline</span>
+                <div
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center shadow-lg shadow-pink-500/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
                 </div>
                 <h1 class="text-2xl font-extrabold tracking-tight gradient-text">Medya İndirici</h1>
             </div>
@@ -461,7 +467,7 @@
                         type: type,
                         title: currentVideoData.title || "Video",
                         thumbnail: currentVideoData.thumbnail || "",
-                        format_id: formatId
+                        format_id: formatId ? formatId : null
                     })
                 });
 

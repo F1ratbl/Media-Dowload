@@ -4,10 +4,18 @@ from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from history import HistoryManager
-from worker import download_worker, fetch_video_info, download_tasks
+from app.services.history import HistoryManager
+from app.services.downloader import download_worker, fetch_video_info, download_tasks
+from typing import Optional
+from app.database import engine, Base
+from fastapi.staticfiles import StaticFiles
+
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+# Statik Dosyalar (Logo, CSS vb.)
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,7 +33,7 @@ class DownloadRequest(BaseModel):
     type: str = "video"
     title: str
     thumbnail: str
-    format_id: str = None
+    format_id: Optional[str] = None
 
 # Endpoints
 @app.get("/")
